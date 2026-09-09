@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# digitalservices-admin
 
-## Getting Started
+Sistema administrativo para DigitalServices desarrollado con Next.js, React, TypeScript, Supabase, Tailwind CSS y arquitectura por features.
 
-First, run the development server:
+## Requisitos
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Node.js 20 o superior.
+- Proyecto Supabase con Auth, Database, Storage y RLS.
+
+## Configuración
+
+1. Copia `.env.example` a `.env.local` o `.env`.
+2. Completa `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` y `NEXT_PUBLIC_URL_APLICACION`.
+3. Ejecuta la migración `supabase/migrations/001_esquema_inicial.sql` en Supabase.
+4. Crea el primer usuario en Supabase Auth y registra su perfil activo en `public.usuarios`.
+   Para el primer superadmin puedes ejecutar este SQL en Supabase, cambiando el correo:
+
+```sql
+insert into public.usuarios (id, correo, nombres, apellidos, rol, estado)
+select
+  id,
+  email,
+  coalesce(raw_user_meta_data->>'nombres', 'Super'),
+  coalesce(raw_user_meta_data->>'apellidos', 'Admin'),
+  'superadmin',
+  'activo'
+from auth.users
+where email = 'admin@digitalservices.bo'
+on conflict (id) do update
+set
+  correo = excluded.correo,
+  rol = excluded.rol,
+  estado = excluded.estado;
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Instala dependencias y ejecuta el entorno local:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Scripts
 
-## Learn More
+- `npm run dev`: inicia el entorno local.
+- `npm run build`: compila para producción.
+- `npm run lint`: valida reglas de lint.
+- `npm run typecheck`: valida tipos TypeScript.
 
-To learn more about Next.js, take a look at the following resources:
+## Roles
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `superadmin`: acceso total, configuración financiera y auditoría.
+- `administrador`: gestión operativa, liquidaciones, pagos y reportes.
+- `docente`: perfil, temario, alumnos inscritos, ganancias e historial de pagos.
