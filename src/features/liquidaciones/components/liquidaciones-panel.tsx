@@ -27,15 +27,18 @@ import { usarPagos } from "@/features/pagos/hooks/usar-pagos";
 import { usarTandas } from "@/features/tandas/hooks/usar-tandas";
 import type { EstadoLiquidacion, Tanda } from "@/lib/supabase/tipos-base-datos";
 import { formatearFechaHora, formatearMoneda } from "@/lib/utilidades/formato";
+
 function obtenerNombreDocente(fila: LiquidacionRegistro) {
   return fila.docentes?.usuarios
     ? `${fila.docentes.usuarios.nombres} ${fila.docentes.usuarios.apellidos}`
     : fila.docente_id;
 }
+
 function obtenerEtiquetaEstado(estado: EstadoLiquidacion | null | undefined) {
   if (estado === "PAGADO") return "PAGADO";
   return estado ?? "PENDIENTE";
 }
+
 function obtenerTandaActual(tandas: Tanda[]) {
   const abierta = tandas.find((tanda) => String(tanda.estado).toLowerCase() === "abierta");
   if (abierta) return abierta;
@@ -48,6 +51,7 @@ function obtenerTandaActual(tandas: Tanda[]) {
   });
   return porFecha ?? tandas[0] ?? null;
 }
+
 export function LiquidacionesPanel() {
   const tandasHook = usarTandas();
   const [tandaSeleccionada, setTandaSeleccionada] = useState("");
@@ -58,6 +62,7 @@ export function LiquidacionesPanel() {
   const [detalle, setDetalle] = useState<LiquidacionDetalle | null>(null);
   const [cargandoDetalle, setCargandoDetalle] = useState(false);
   const [confirmandoPago, setConfirmandoPago] = useState(false);
+
   const opcionesTandas = useMemo(
     () => [
       { etiqueta: "Seleccionar tanda", valor: "" },
@@ -68,10 +73,12 @@ export function LiquidacionesPanel() {
     ],
     [tandasHook.tandas]
   );
+
   useEffect(() => {
     if (tandaSeleccionada || tandasHook.tandas.length === 0) return;
     setTandaSeleccionada(obtenerTandaActual(tandasHook.tandas)?.id ?? "");
   }, [tandaSeleccionada, tandasHook.tandas]);
+
   async function manejarSincronizar() {
     if (!tandaSeleccionada) {
       toast.error("Selecciona una tanda.");
@@ -97,6 +104,7 @@ export function LiquidacionesPanel() {
     }
     liquidacionesHook.refrescar();
   }
+
   async function manejarVerDetalle(fila: LiquidacionRegistro) {
     setDetalleAbierto(true);
     setDetalle(null);
@@ -110,6 +118,7 @@ export function LiquidacionesPanel() {
     }
     setDetalle(resultado.datos);
   }
+
   async function manejarConfirmarPago() {
     if (!detalle) return;
     setConfirmandoPago(true);
@@ -134,6 +143,7 @@ export function LiquidacionesPanel() {
     liquidacionesHook.refrescar();
     pagosHook.refrescar();
   }
+
   async function manejarAnular(id: string) {
     const resultado = await liquidacionesHook.anular(id);
     if (resultado?.error) {
@@ -143,7 +153,9 @@ export function LiquidacionesPanel() {
     toast.success("Liquidación anulada.");
     liquidacionesHook.refrescar();
   }
+
   const cargandoListado = liquidacionesHook.cargando || tandasHook.cargando;
+
   return (
     <div className="grid gap-6">
       <EncabezadoPagina
@@ -244,14 +256,14 @@ export function LiquidacionesPanel() {
                     className="h-8 px-2 text-xs"
                     onClick={() => manejarVerDetalle(fila)}
                   >
-                    {fila.estado === "pendiente" ? (
+                    {fila.estado === "PENDIENTE" ? (
                       <CreditCard className="h-3.5 w-3.5" />
                     ) : (
                       <Eye className="h-3.5 w-3.5" />
                     )}
-                    {fila.estado === "pendiente" ? "Pagar" : "Ver detalle"}
+                    {fila.estado === "PENDIENTE" ? "Pagar" : "Ver detalle"}
                   </Boton>
-                  {fila.estado === "pendiente" ? (
+                  {fila.estado === "PENDIENTE" ? (
                     <button
                       type="button"
                       className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-[var(--color-borde)] text-[var(--color-peligro)] hover:bg-[var(--color-panel-suave)]"
@@ -381,7 +393,7 @@ export function LiquidacionesPanel() {
                     </div>
                   </div>
                   <div className="flex flex-col gap-2">
-                    {detalle.liquidacion.estado === "pendiente" ? (
+                    {detalle.liquidacion.estado === "PENDIENTE" ? (
                       <Boton
                         type="button"
                         onClick={manejarConfirmarPago}
