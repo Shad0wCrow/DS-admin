@@ -52,7 +52,7 @@ export async function registrarPagoDocente(
     return { datos: null, error: "Esta liquidación ya fue pagada." };
   }
 
-  if (liquidacionActual.estado === "NULL") {
+  if (liquidacionActual.estado === "ANULADA") {
     return { datos: null, error: "No se puede pagar una liquidación anulada." };
   }
 
