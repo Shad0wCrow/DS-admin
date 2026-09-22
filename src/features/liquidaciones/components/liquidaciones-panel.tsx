@@ -222,7 +222,7 @@ export function LiquidacionesPanel() {
               renderizar: (fila: LiquidacionRegistro) => (
                 <Insignia
                   tono={
-                    fila.estado === "NULL"
+                    !fila.estado
                       ? "peligro"
                       : fila.estado === "PAGADO"
                         ? "exito"
