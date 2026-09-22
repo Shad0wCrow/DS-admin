@@ -1,4 +1,6 @@
+import { Suspense } from "react";
 import Link from "next/link";
+import { EstadoCarga } from "@/components/common/estado-carga";
 import { LogoDigitalServices } from "@/components/common/logo";
 import { LoginForm } from "@/features/autenticacion/forms/login-form";
 
@@ -11,7 +13,9 @@ export default function LoginPage() {
           Acceso administrativo
         </h1>
       </div>
-      <LoginForm />
+      <Suspense fallback={<EstadoCarga />}>
+        <LoginForm />
+      </Suspense>
       <Link
         href="/recuperar-contrasena"
         className="mt-5 inline-flex text-sm font-medium text-[var(--color-texto-secundario)] hover:text-[var(--color-texto)]"

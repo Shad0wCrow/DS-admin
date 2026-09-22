@@ -125,7 +125,7 @@ export function GananciasDocentePanel() {
               clave: "estado",
               titulo: "Estado",
               renderizar: (fila) => (
-                <Insignia tono={fila.estado === "PAGADO" ? "exito" : fila.estado === "anulada" ? "peligro" : "neutro"}>
+                <Insignia tono={fila.estado === "PAGADO" ? "exito" : fila.estado === "ANULADA" ? "peligro" : "neutro"}>
                   {fila.estado}
                 </Insignia>
               )
