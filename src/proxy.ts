@@ -44,7 +44,7 @@ function obtenerDatosUsuarioDesdeCookie(request: NextRequest): DatosUsuarioCooki
   }
 }
 
-const RUTAS_PERMITIDAS_DOCENTE = ["/estudiantes", "/inscripciones"];
+const RUTAS_PERMITIDAS_DOCENTE = ["/estudiantes", "/inscripciones", "/perfil"];
 const RUTAS_PERMITIDAS_ADMIN = [
   "/dashboard",
   "/estudiantes",
@@ -54,6 +54,7 @@ const RUTAS_PERMITIDAS_ADMIN = [
   "/liquidaciones",
   "/pagos",
   "/reportes",
+  "/perfil",
 ];
 
 function esRutaPermitida(pathname: string, rol: string): boolean {
